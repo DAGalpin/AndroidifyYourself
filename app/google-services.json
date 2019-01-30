@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "285783877711",
+    "firebase_url": "https://facialrecognitionhack.firebaseio.com",
+    "project_id": "facialrecognitionhack",
+    "storage_bucket": "facialrecognitionhack.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:285783877711:android:ecd070b72c588c7f",
+        "android_client_info": {
+          "package_name": "com.example.androidyourself"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "285783877711-22fbi6vb31migkoj3622k3gmfi8bhdj7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvTyUnjBqfsdf3ZGCdSJEvjek6ZPHtjEI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
