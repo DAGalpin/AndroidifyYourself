@@ -6,12 +6,13 @@ import android.util.AttributeSet
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark
 
 
 
-class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
+class CustomImageView(context: Context?, attrs: AttributeSet?) : ImageView(context, attrs) {
 
     // The detected face
     var face: FirebaseVisionFace? = null
@@ -22,12 +23,6 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
             postInvalidate()
         }
 
-    // The preview width
-    var previewWidth: Int? = null
-
-    // The preview height
-    var previewHeight: Int? = null
-
     private var widthScaleFactor = 1.0f
     private var heightScaleFactor = 1.0f
 
@@ -37,24 +32,8 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        if (face != null) {
-            Log.i("onDraw", "Drawing")
-            // Create local variables here so they canot not be changed anywhere else
-            val face = face
-            val previewWidth = previewWidth
-            val previewHeight = previewHeight
-
-            if (face != null && canvas != null && previewWidth != null && previewHeight != null) {
-
-                // Calculate the scale factor??
-                widthScaleFactor = canvas.width.toFloat() / previewWidth.toFloat()
-                heightScaleFactor = canvas.height.toFloat() / previewHeight.toFloat()
-
-                Log.i("**width scale", widthScaleFactor.toString())
-                Log.i("**height scale", heightScaleFactor.toString())
-
-                drawGlasses(canvas, face)
-            }
+        if (face != null && canvas != null) {
+            drawGlasses(canvas, face!!)
         }
         else{
             Log.i("onDraw", "not drawing")
@@ -66,6 +45,39 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
     //try locating the eyes and put these glasses on them
     private fun drawGlasses(canvas: Canvas, face: FirebaseVisionFace) {
         Log.i("drawGlasses", "Drawing")
+
+        Log.i("onDraw", "Drawing")
+        // super messy calculation for this.  What the ImageView will do is center the image and maintain the
+        // aspect ratio by default
+        val imageHeight = drawable.intrinsicHeight.toFloat()
+        val imageWidth = drawable.intrinsicWidth.toFloat()
+
+        val canvasHeight = canvas.height.toFloat()
+        val canvasWidth = canvas.width.toFloat()
+
+        val imageAdjustedWidth: Float
+        val imageAdjustedHeight: Float
+        val imageHorizontalOffset: Float
+        val imageVerticalOffset: Float
+        val scaleFactor: Float
+        if ( canvasHeight/imageHeight > canvasWidth/imageWidth ) {
+            // we're going to center horizontally
+            imageAdjustedWidth = canvasWidth
+            imageHorizontalOffset = 0f
+            scaleFactor = canvasWidth/imageWidth
+            imageAdjustedHeight = scaleFactor*imageHeight
+            imageVerticalOffset = (canvasHeight-imageAdjustedHeight)/2f
+        } else {
+            imageAdjustedHeight = canvasHeight
+            imageVerticalOffset = 0f
+            scaleFactor = canvasHeight/imageHeight
+            imageAdjustedWidth = scaleFactor*imageHeight
+            imageHorizontalOffset = (canvasWidth-imageAdjustedWidth)/2f
+        }
+
+        val bounds = RectF(imageHorizontalOffset,imageVerticalOffset,imageHorizontalOffset+imageAdjustedWidth,
+            imageVerticalOffset+imageAdjustedHeight)
+
         val leftEye = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE)
         val rightEye = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE)
 
@@ -81,17 +93,19 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
             val paint = Paint()
             paint.color = Color.GREEN
 
-//            private val glassesImage: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.glasses)
-//            val eyeRect = Rect(
-//                leftEye.position.x.toInt() - 20,
-//                leftEye.position.y.toInt() - 20,
-//                rightEye.position.x.toInt() + 20,
-//                rightEye.position.y.toInt() + 20)
+//            canvas.drawRect(bounds, paint)
+
+           val glassesImage: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.glasses)
+           val eyeRect = RectF(
+                leftEye.position.x*scaleFactor+imageHorizontalOffset,
+                leftEye.position.y*scaleFactor+imageVerticalOffset,
+                rightEye.position.x*scaleFactor+imageHorizontalOffset,
+                rightEye.position.y*scaleFactor+imageVerticalOffset)
 
             //draw a line to the eye
 //           canvas.drawLine(0.toFloat(), 0.toFloat(), leftEyePixelX, leftEyePixelY, paint)
 
-//           canvas.drawBitmap(glassesImage, null, eyeRect, null)
+           canvas.drawBitmap(glassesImage, null, eyeRect, null)
 
         }
     }

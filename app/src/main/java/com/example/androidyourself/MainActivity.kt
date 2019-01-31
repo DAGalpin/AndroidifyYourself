@@ -3,6 +3,7 @@ package com.example.androidyourself
 
 import android.content.res.Resources
 import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -15,7 +16,6 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 class MainActivity : AppCompatActivity() {
 
     private lateinit var customImageView: CustomImageView
-    private lateinit var faceImage: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,8 +26,7 @@ class MainActivity : AppCompatActivity() {
             Log.i("Button", "Clicked")
         }
         customImageView = findViewById(R.id.customView)
-        faceImage= findViewById(R.id.faceImage)
-        faceImage.setImageResource(R.drawable.hrithik)
+        customImageView.setImageResource(R.drawable.hrithik)
 
         firebaseFacialDetection()
 
@@ -52,8 +51,6 @@ class MainActivity : AppCompatActivity() {
                 for(face in faces){
                     val bounds = face.boundingBox
                     customImageView.face = face
-                    customImageView.previewHeight = Resources.getSystem().getDisplayMetrics().heightPixels
-                    customImageView.previewWidth = Resources.getSystem().getDisplayMetrics().widthPixels
 
                     //print out facial bounds
                     Log.i("Bounds bottom", bounds.bottom.toString())
